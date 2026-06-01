@@ -108,6 +108,20 @@ Necesito intervención para continuar.
 
 ---
 
+## Disponibilidad de backends y fallback
+
+Antes de asignar `run-agent:` a las actividades, consulta qué CLIs hay instalados:
+
+```bash
+python3 ~/.claude/skills/hybrid-orchestrator/scripts/run_subagent.py --check
+```
+
+En ejecución, si el backend declarado no está instalado, `run_subagent.py` cae por una cadena de preferencia hasta `claude` (último recurso garantizado). El orden por defecto es `gemini → codex → cursor-agent → claude` y se puede sobreescribir con la env var `HYBRID_FALLBACK_ORDER` (CSV; `claude` siempre queda al final).
+
+Cuando ocurre un fallback, el script imprime `⚠️ FALLBACK: ...`. Registra ese cambio en el `.md` de la actividad por trazabilidad.
+
+---
+
 ## Archivos de esta skill
 
 ```

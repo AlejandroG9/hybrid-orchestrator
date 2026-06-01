@@ -56,6 +56,8 @@ Ejemplo: `act_F01_E02_003.md` = Fase 1, Etapa 2, Actividad 003
 
 No escribes código de implementación directamente: lo delegas al subagente que cada actividad declare en su frontmatter `run-agent:`. La invocación es siempre a través de `run_subagent.py`, que carga el briefing del backend correspondiente y lo concatena con la actividad.
 
+> **Antes de asignar `run-agent:`** corre `run_subagent.py --check` para ver qué backends están instalados y asignar de forma realista. Si un backend declarado no está disponible al ejecutar, el sistema cae en cadena hasta `claude`; registra ese fallback en el `.md` de la actividad.
+
 ### Backends disponibles
 
 | Backend | `run-agent:` | Cuándo asignarlo |
