@@ -29,6 +29,26 @@ DEFAULT_BACKEND = "gemini"
 FALLBACK_ORDER = ["gemini", "codex", "cursor-agent", "claude"]  # claude SIEMPRE al final
 
 
+def effective_fallback_order() -> list:
+    """
+    Cadena de fallback efectiva. Lee HYBRID_FALLBACK_ORDER (CSV) si está;
+    ignora nombres desconocidos y garantiza 'claude' al final.
+    """
+    raw = os.environ.get("HYBRID_FALLBACK_ORDER", "").strip()
+    if raw:
+        order = [x.strip() for x in raw.split(",") if x.strip() in BACKENDS]
+        if not order:
+            print("⚠️  HYBRID_FALLBACK_ORDER inválido — usando orden por defecto")
+            order = list(FALLBACK_ORDER)
+    else:
+        order = list(FALLBACK_ORDER)
+
+    # Forzar claude como último recurso
+    order = [b for b in order if b != "claude"]
+    order.append("claude")
+    return order
+
+
 def resolve_backend(declared: str, available: set, order: list) -> tuple:
     """
     Elige el backend a usar dado el declarado y los disponibles.

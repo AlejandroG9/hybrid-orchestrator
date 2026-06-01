@@ -1,6 +1,7 @@
 import sys
 import unittest
 from pathlib import Path
+from unittest import mock
 
 # Permitir importar el script (no es un paquete instalable)
 SCRIPTS = Path(__file__).resolve().parent.parent / "scripts"
@@ -40,6 +41,38 @@ class TestResolveBackend(unittest.TestCase):
     def test_raises_when_nothing_available(self):
         with self.assertRaises(RuntimeError):
             r.resolve_backend("gemini", available=set(), order=self.order)
+
+
+class TestEffectiveFallbackOrder(unittest.TestCase):
+    def test_default_when_no_env(self):
+        with mock.patch.dict("os.environ", {}, clear=True):
+            order = r.effective_fallback_order()
+        self.assertEqual(order, ["gemini", "codex", "cursor-agent", "claude"])
+
+    def test_env_override_respected_claude_last(self):
+        with mock.patch.dict("os.environ", {"HYBRID_FALLBACK_ORDER": "codex,gemini,claude"}, clear=True):
+            order = r.effective_fallback_order()
+        self.assertEqual(order, ["codex", "gemini", "claude"])
+        self.assertEqual(order[-1], "claude")
+
+    def test_env_override_without_claude_appends_it(self):
+        with mock.patch.dict("os.environ", {"HYBRID_FALLBACK_ORDER": "codex,gemini"}, clear=True):
+            order = r.effective_fallback_order()
+        self.assertEqual(order[-1], "claude")
+        self.assertIn("codex", order)
+
+    def test_env_override_ignores_unknown_names(self):
+        with mock.patch.dict("os.environ", {"HYBRID_FALLBACK_ORDER": "foo,codex,bar"}, clear=True):
+            order = r.effective_fallback_order()
+        self.assertNotIn("foo", order)
+        self.assertNotIn("bar", order)
+        self.assertIn("codex", order)
+        self.assertEqual(order[-1], "claude")
+
+    def test_env_override_all_invalid_falls_to_default(self):
+        with mock.patch.dict("os.environ", {"HYBRID_FALLBACK_ORDER": "foo,bar"}, clear=True):
+            order = r.effective_fallback_order()
+        self.assertEqual(order, ["gemini", "codex", "cursor-agent", "claude"])
 
 
 if __name__ == "__main__":
