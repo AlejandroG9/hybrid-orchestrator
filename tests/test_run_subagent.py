@@ -75,5 +75,22 @@ class TestEffectiveFallbackOrder(unittest.TestCase):
         self.assertEqual(order, ["gemini", "codex", "cursor-agent", "claude"])
 
 
+class TestAvailability(unittest.TestCase):
+    def test_is_available_true_when_which_finds_it(self):
+        with mock.patch("run_subagent.shutil.which", return_value="/usr/bin/gemini"):
+            self.assertTrue(r.is_available("gemini"))
+
+    def test_is_available_false_when_which_returns_none(self):
+        with mock.patch("run_subagent.shutil.which", return_value=None):
+            self.assertFalse(r.is_available("gemini"))
+
+    def test_available_backends_collects_only_installed(self):
+        def fake_which(exe):
+            return "/path" if exe in ("gemini", "claude") else None
+        with mock.patch("run_subagent.shutil.which", side_effect=fake_which):
+            avail = r.available_backends()
+        self.assertEqual(avail, {"gemini", "claude"})
+
+
 if __name__ == "__main__":
     unittest.main()

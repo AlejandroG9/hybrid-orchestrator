@@ -9,6 +9,7 @@ import subprocess
 import sys
 import os
 import re
+import shutil
 from pathlib import Path
 from datetime import datetime
 
@@ -47,6 +48,17 @@ def effective_fallback_order() -> list:
     order = [b for b in order if b != "claude"]
     order.append("claude")
     return order
+
+
+def is_available(backend: str) -> bool:
+    """True si el ejecutable del backend está en PATH."""
+    exe = BACKENDS[backend][0]
+    return shutil.which(exe) is not None
+
+
+def available_backends() -> set:
+    """Conjunto de backends instalados en el sistema."""
+    return {b for b in BACKENDS if is_available(b)}
 
 
 def resolve_backend(declared: str, available: set, order: list) -> tuple:
