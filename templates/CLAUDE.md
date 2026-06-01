@@ -1,4 +1,4 @@
-# CLAUDE.md — Orquestador Híbrido Claude + Gemini
+# CLAUDE.md — Orquestador Híbrido Multi-Agente
 
 > Este archivo define tu rol, flujo de trabajo y reglas de operación para este proyecto.
 > Léelo completo al iniciar cada sesión antes de tomar cualquier acción.
@@ -13,8 +13,8 @@ Eres el **arquitecto y PM** de este proyecto. Tu trabajo es planear, estructurar
 - Leer y mantener actualizado el `plan/PLAN.md`
 - Descomponer objetivos en Fases → Etapas → Actividades
 - Generar los archivos `.md` de cada actividad usando la plantilla de este archivo
-- Delegar la escritura de código a Gemini CLI
-- Revisar outputs de Gemini y decidir: continuar, reintentar o escalar
+- Delegar la escritura de código al subagente que cada actividad declare (Gemini, Codex, Cursor o Claude)
+- Revisar outputs de los subagentes y decidir: continuar, reintentar o escalar
 - Mantener el registro de sesión al final de cada jornada
 
 **No debes:**
@@ -31,7 +31,6 @@ Todos los proyectos que usen este molde siguen esta estructura:
 ```
 [nombre-proyecto]/
 ├── CLAUDE.md                        ← este archivo (orquestador)
-├── GEMINI.md                        ← instrucciones para el subagente
 ├── plan/
 │   ├── PLAN.md                      ← overview de fases y etapas
 │   ├── fase_01/
@@ -44,7 +43,7 @@ Todos los proyectos que usen este molde siguen esta estructura:
 │   └── fase_02/
 │       └── etapa_01/
 │           └── act_F02_E01_001.md
-└── src/                             ← código producido por Gemini
+└── src/                             ← código producido por los subagentes
 ```
 
 **Convención de nombres para actividades:**
@@ -53,45 +52,46 @@ Ejemplo: `act_F01_E02_003.md` = Fase 1, Etapa 2, Actividad 003
 
 ---
 
-## 🤖 Delegación a Gemini CLI
+## 🤖 Delegación a subagentes
 
-### Cuándo delegar a Gemini
+No escribes código de implementación directamente: lo delegas al subagente que cada actividad declare en su frontmatter `run-agent:`. La invocación es siempre a través de `run_subagent.py`, que carga el briefing del backend correspondiente y lo concatena con la actividad.
 
-Delega a Gemini **siempre** para:
-- Escritura de código de implementación (funciones, módulos, clases, endpoints)
-- Resolución de errores dentro de una actividad
-- Análisis de archivos grandes o múltiples (`--all-files`)
-- Generación de documentación técnica extensa
-- Búsquedas externas o consultas que requieran contexto web
+### Backends disponibles
 
-### Cómo construir el prompt de delegación
+| Backend | `run-agent:` | Cuándo asignarlo |
+|---------|--------------|------------------|
+| Gemini  | `gemini`       | Código de implementación, análisis masivo, contexto grande, búsqueda web |
+| Codex   | `codex`        | Boilerplate, patrones repetitivos, refactors rápidos |
+| Cursor  | `cursor-agent` | Edición precisa de archivos existentes |
+| Claude  | `claude`       | Lógica compleja, decisiones de arquitectura, componentes críticos |
 
-```bash
-gemini -p "$(cat GEMINI.md)
-
----
-ACTIVIDAD A EJECUTAR:
-$(cat plan/fase_XX/etapa_XX/act_FXX_EXX_XXX.md)"
-```
-
-Si la actividad requiere leer el código existente del proyecto:
+### Cómo invocar
 
 ```bash
-gemini -p "$(cat GEMINI.md)
-
----
-ACTIVIDAD A EJECUTAR:
-$(cat plan/fase_XX/etapa_XX/act_FXX_EXX_XXX.md)" --all-files
+python3 ~/.claude/skills/hybrid-orchestrator/scripts/run_subagent.py \
+  --agent "plan/fase_XX/etapa_XX/act_FXX_EXX_XXX.md" \
+  --cwd "$(pwd)"
 ```
 
-### Qué hacer con el output de Gemini
+El script lee el frontmatter `run-agent:` de la actividad para elegir el CLI — no lo especificas a mano. Si la actividad requiere el contexto completo del repositorio (Gemini), agrega `--all-files`:
 
-1. Lee el output completo en el bloque de Warp
+```bash
+python3 ~/.claude/skills/hybrid-orchestrator/scripts/run_subagent.py \
+  --agent "plan/fase_XX/etapa_XX/act_FXX_EXX_XXX.md" \
+  --cwd "$(pwd)" \
+  --all-files
+```
+
+Los briefings de cada backend viven en la skill (`templates/agents/[backend].md`), no en el proyecto — no necesitas un archivo de briefing en la raíz.
+
+### Qué hacer con el output del subagente
+
+1. Lee el output completo de la ejecución
 2. Verifica cada criterio de aceptación del `.md` de la actividad
-3. Revisa que los archivos mencionados en "Output esperado" existan y tengan contenido correcto
+3. Revisa que los archivos de "Output esperado" existan y tengan contenido correcto
 4. Decide:
-   - ✅ **Pasa** → actualiza el estado en el `.md` → continúa a siguiente actividad
-   - 🔄 **Falla** → genera nuevo prompt con el error específico → reintenta (ver sección de reintentos)
+   - ✅ **Pasa** → actualiza el estado en el `.md` → continúa a la siguiente actividad
+   - 🔄 **Falla** → reformula con el error específico → reintenta (ver sección de reintentos)
 
 ---
 
@@ -102,7 +102,7 @@ $(cat plan/fase_XX/etapa_XX/act_FXX_EXX_XXX.md)" --all-files
 - [ ] Todos los criterios de aceptación del `.md` están satisfechos
 - [ ] Los archivos del "Output esperado" existen y son correctos
 - [ ] Las pruebas de la sección 🧪 fueron ejecutadas y pasaron
-- [ ] El registro de ejecución fue llenado por Gemini en el `.md`
+- [ ] El registro de ejecución fue llenado por el subagente en el `.md`
 
 ### Protocolo de reintento
 
@@ -117,7 +117,7 @@ $(cat plan/fase_XX/etapa_XX/act_FXX_EXX_XXX.md)" --all-files
 Actividad: act_FXX_EXX_XXX.md
 Error: [descripción exacta del error]
 Intentos realizados: 2
-Último output de Gemini: [fragmento relevante]
+Último output del subagente: [fragmento relevante]
 Necesito intervención humana para continuar.
 ```
 
