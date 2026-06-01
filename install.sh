@@ -52,13 +52,19 @@ else
     cp "$SKILL_SOURCE/SKILL.md"                "$SKILL_TARGET/SKILL.md"
     cp "$SKILL_SOURCE/scripts/run_subagent.py" "$SKILL_TARGET/scripts/run_subagent.py"
     chmod +x "$SKILL_TARGET/scripts/run_subagent.py"
-    echo "✅ Skill instalada en $SKILL_TARGET"
+
+    # Copiar plantillas dentro de la skill — run_subagent.py carga los briefings
+    # de cada backend desde $SKILL_TARGET/templates/agents/[backend].md
+    rm -rf "$SKILL_TARGET/templates"
+    cp -R "$SKILL_SOURCE/templates" "$SKILL_TARGET/templates"
+    find "$SKILL_TARGET/templates" -name '.DS_Store' -delete 2>/dev/null || true
+    echo "✅ Skill instalada en $SKILL_TARGET (incluye templates/agents/)"
 fi
 
 # ── 3. Instalar plantillas en ~/plantillas-hybrid/ ────────────────
 mkdir -p "$TEMPLATES_TARGET"
 
-for archivo in CLAUDE.md GEMINI.md PLAN.md activity.md; do
+for archivo in CLAUDE.md PLAN.md activity.md; do
     src="$SKILL_SOURCE/templates/$archivo"
     dst="$TEMPLATES_TARGET/$archivo"
 

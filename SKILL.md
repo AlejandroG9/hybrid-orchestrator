@@ -117,7 +117,11 @@ hybrid-orchestrator/
 │   └── run_subagent.py   ← invocador de subagentes
 └── templates/
     ├── CLAUDE.md         ← molde para nuevos proyectos
-    ├── GEMINI.md         ← briefing del subagente
     ├── PLAN.md           ← documento maestro del proyecto
-    └── activity.md       ← plantilla de actividad individual
+    ├── activity.md       ← plantilla de actividad individual
+    └── agents/           ← briefings por backend (los carga run_subagent.py)
+        ├── gemini.md
+        ├── codex.md
+        ├── cursor.md
+        └── claude.md
 ```
