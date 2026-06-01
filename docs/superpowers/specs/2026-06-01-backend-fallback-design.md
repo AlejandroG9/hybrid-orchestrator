@@ -1,7 +1,7 @@
 # Feature B — Adaptación a herramientas + fallback en cadena
 
 **Fecha:** 2026-06-01
-**Estado:** Diseño aprobado, pendiente de implementación
+**Estado:** Implementado (2026-06-01)
 **Skill:** hybrid-orchestrator
 
 ---
