@@ -224,6 +224,25 @@ def list_agents(agents_dir: Path):
     print()
 
 
+# ── Doctor de backends ────────────────────────────────────────────────────────
+
+def print_check() -> None:
+    """Reporta qué backends están instalados y la cadena de fallback efectiva."""
+    print("Backends:")
+    for backend in BACKENDS:
+        exe = BACKENDS[backend][0]
+        path = shutil.which(exe)
+        if path:
+            print(f"  {backend:13} ✅ {path}")
+        else:
+            print(f"  {backend:13} ❌ no instalado")
+
+    order = effective_fallback_order()
+    avail = available_backends()
+    cadena = " → ".join(b for b in order if b in avail) or "(ninguno instalado)"
+    print(f"\nCadena efectiva: {cadena}")
+
+
 # ── Main ─────────────────────────────────────────────────────────────────────
 
 def main():
@@ -236,8 +255,14 @@ def main():
     parser.add_argument("--all-files", action="store_true", help="Pasar contexto completo del repo al subagente")
     parser.add_argument("--timeout",   type=int, default=600, help="Timeout en segundos (default: 600)")
     parser.add_argument("--list",      action="store_true", help="Listar actividades disponibles")
+    parser.add_argument("--check",     action="store_true", help="Reporta backends instalados y la cadena de fallback")
 
     args = parser.parse_args()
+
+    # ── Modo doctor ──────────────────────────────────────────────────────────
+    if args.check:
+        print_check()
+        return
 
     # Directorio de trabajo
     cwd = args.cwd or os.getcwd()

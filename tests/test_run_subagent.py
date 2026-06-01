@@ -1,5 +1,7 @@
+import io
 import sys
 import unittest
+from contextlib import redirect_stdout
 from pathlib import Path
 from unittest import mock
 
@@ -90,6 +92,22 @@ class TestAvailability(unittest.TestCase):
         with mock.patch("run_subagent.shutil.which", side_effect=fake_which):
             avail = r.available_backends()
         self.assertEqual(avail, {"gemini", "claude"})
+
+
+class TestCheck(unittest.TestCase):
+    def test_print_check_lists_installed_and_missing(self):
+        def fake_which(exe):
+            return "/usr/bin/" + exe if exe in ("gemini", "claude") else None
+        buf = io.StringIO()
+        with mock.patch("run_subagent.shutil.which", side_effect=fake_which):
+            with mock.patch.dict("os.environ", {}, clear=True):
+                with redirect_stdout(buf):
+                    r.print_check()
+        out = buf.getvalue()
+        self.assertIn("gemini", out)
+        self.assertIn("✅", out)
+        self.assertIn("❌", out)
+        self.assertIn("Cadena efectiva", out)
 
 
 if __name__ == "__main__":
