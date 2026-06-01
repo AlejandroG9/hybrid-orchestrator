@@ -294,10 +294,27 @@ def main():
     content = agent_path.read_text(encoding="utf-8")
     meta, body = parse_frontmatter(content)
 
-    # Determinar backend
-    backend = args.cli or meta.get("run-agent", DEFAULT_BACKEND)
+    # Determinar backend declarado y resolver disponibilidad / fallback
+    declared = args.cli or meta.get("run-agent", DEFAULT_BACKEND)
 
-    # Construir prompt
+    if declared not in BACKENDS:
+        print(f"❌ Backend '{declared}' no reconocido. Disponibles: {list(BACKENDS.keys())}")
+        sys.exit(1)
+
+    try:
+        backend, fell_back, motivo = resolve_backend(
+            declared, available_backends(), effective_fallback_order()
+        )
+    except RuntimeError as e:
+        print(f"❌ {e}")
+        sys.exit(1)
+
+    if fell_back:
+        print(f"⚠️  FALLBACK: {motivo}")
+        if declared == "gemini" and args.all_files:
+            print("   (--all-files se descarta: solo aplica a gemini)")
+
+    # Construir prompt con el briefing del backend EFECTIVO
     prompt = build_prompt(content, backend)
 
     # Mostrar resumen antes de ejecutar
