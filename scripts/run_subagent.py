@@ -24,6 +24,45 @@ BACKENDS = {
 
 DEFAULT_BACKEND = "gemini"
 
+# ── Cadena de fallback ────────────────────────────────────────────────────────
+
+FALLBACK_ORDER = ["gemini", "codex", "cursor-agent", "claude"]  # claude SIEMPRE al final
+
+
+def resolve_backend(declared: str, available: set, order: list) -> tuple:
+    """
+    Elige el backend a usar dado el declarado y los disponibles.
+
+    Args:
+        declared:  backend pedido por la actividad (debe estar en BACKENDS).
+        available: conjunto de backends instalados en el sistema.
+        order:     cadena de preferencia efectiva (claude al final).
+
+    Returns:
+        (backend_elegido, hubo_fallback, motivo)
+
+    Raises:
+        RuntimeError: si ningún backend de la cadena está disponible.
+    """
+    if declared in available:
+        return declared, False, ""
+
+    for candidate in order:
+        if candidate == declared:
+            continue
+        if candidate in available:
+            motivo = (
+                f"'{declared}' no disponible → usando '{candidate}' "
+                f"(siguiente instalado en la cadena)"
+            )
+            return candidate, True, motivo
+
+    raise RuntimeError(
+        f"Ningún backend disponible para ejecutar '{declared}'. "
+        f"Instala al menos uno (recomendado: claude)."
+    )
+
+
 # ── Rutas de plantillas ───────────────────────────────────────────────────────
 
 SKILL_DIR = Path(__file__).parent.parent
