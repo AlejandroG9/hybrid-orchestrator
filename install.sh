@@ -59,7 +59,13 @@ else
     rm -rf "$SKILL_TARGET/templates"
     cp -R "$SKILL_SOURCE/templates" "$SKILL_TARGET/templates"
     find "$SKILL_TARGET/templates" -name '.DS_Store' -delete 2>/dev/null || true
-    echo "✅ Skill instalada en $SKILL_TARGET (incluye templates/agents/)"
+
+    # Copiar referencias (progressive disclosure) — SKILL.md las apunta con REQUIRED
+    rm -rf "$SKILL_TARGET/references"
+    cp -R "$SKILL_SOURCE/references" "$SKILL_TARGET/references"
+    find "$SKILL_TARGET/references" -name '.DS_Store' -delete 2>/dev/null || true
+
+    echo "✅ Skill instalada en $SKILL_TARGET (incluye templates/agents/ y references/)"
 fi
 
 # ── 3. Instalar plantillas en ~/plantillas-hybrid/ ────────────────
