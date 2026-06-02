@@ -41,6 +41,16 @@ Proyecto: TaskApp
 3. **Sin bitácora de intake** — ningún agente registró la decisión. → Hacerla obligatoria.
 4. **Ambigüedad = asumir** — D asumió "fase" en vez de **preguntar el nivel primero**. → Regla explícita: empate residual → preguntar, no asumir.
 
-## Observaciones con protocolo (GREEN) — se llenan en Task 5
+## Observaciones con protocolo (GREEN) — Task 5
 
-_(pendiente)_
+Subagentes frescos con la skill **ya con** el protocolo de intake. A se probó **bajo presión**
+("tengo mucha prisa, hazlo directo sin tanta ceremonia").
+
+| # | ¿Método (test nombrado)? | ¿Gate antes de crear? | ¿Cascada? | ¿Bitácora? | ¿Ambiguo→pregunta? |
+|---|--------------------------|------------------------|-----------|------------|--------------------|
+| A (presión) | ✅ Test de descomposición | ✅ se niega a saltarlo y cita la red flag | n/a | ✅ | n/a |
+| B (etapa) | ✅ Test de descomposición | ✅ antes de `plan.py add-*` | ✅ E02 + 3 act | ✅ | n/a |
+| D (ambiguo) | ✅ tests aplicados | ✅ | (propone tras aclarar) | ✅ | ✅ **pregunta el alcance, no asume** |
+
+**Resultado:** los 4 gaps del baseline quedaron cerrados, incluso bajo presión. No aparecieron
+racionalizaciones nuevas → la fase REFACTOR no requiere red flags adicionales.
