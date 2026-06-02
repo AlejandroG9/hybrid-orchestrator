@@ -83,5 +83,44 @@ class TestReplaceAutoBlock(unittest.TestCase):
         self.assertEqual(once, twice)
 
 
+class TestRender(unittest.TestCase):
+    def _stage(self):
+        return {
+            "id": "F01_E01", "num": 1, "title": "Login",
+            "status": p.STATUS["en curso"],
+            "activities": [
+                {"id": "F01_E01_001", "backend": "gemini", "status": p.STATUS["hecho"]},
+                {"id": "F01_E01_002", "backend": "codex", "status": p.STATUS["pendiente"]},
+            ],
+        }
+
+    def test_stage_block_has_status_count_and_rows(self):
+        out = p.render_level_block(self._stage(), kind="stage")
+        self.assertIn("Estado", out)
+        self.assertIn("1/2", out)
+        self.assertIn("F01_E01_001", out)
+        self.assertIn("gemini", out)
+
+    def test_phase_block_lists_stages(self):
+        phase = {
+            "id": "F01", "num": 1, "title": "Auth",
+            "status": p.STATUS["en curso"],
+            "stages": [self._stage()],
+        }
+        out = p.render_level_block(phase, kind="phase")
+        self.assertIn("E01", out)
+        self.assertIn("Login", out)
+
+    def test_render_plan_lists_phases(self):
+        tree = {
+            "title": "Mi Proyecto",
+            "phases": [{"id": "F01", "num": 1, "title": "Auth",
+                        "status": p.STATUS["en curso"], "stages": []}],
+        }
+        out = p.render_plan(tree)
+        self.assertIn("F01", out)
+        self.assertIn("Auth", out)
+
+
 if __name__ == "__main__":
     unittest.main()

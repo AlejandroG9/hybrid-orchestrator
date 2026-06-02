@@ -93,3 +93,54 @@ def replace_auto_block(text: str, inner: str) -> str:
         return pattern.sub(lambda _: block, text)
     sep = "" if text.endswith("\n") else "\n"
     return f"{text}{sep}\n{block}\n"
+
+
+# ── Render de vistas ──────────────────────────────────────────────────────────
+
+def _count_done(items: list) -> tuple:
+    done = sum(1 for it in items if _category(it["status"]) == "hecho")
+    return done, len(items)
+
+
+def render_level_block(node: dict, kind: str) -> str:
+    """Bloque generado para un _etapa.md (kind='stage') o _fase.md (kind='phase')."""
+    if kind == "stage":
+        acts = node["activities"]
+        done, total = _count_done(acts)
+        lines = [
+            f"**Estado:** {node['status']} ({done}/{total} ✅)",
+            "",
+            "| Actividad | Backend | Estado |",
+            "| --- | --- | --- |",
+        ]
+        for a in acts:
+            lines.append(f"| act_{a['id']} | {a['backend']} | {a['status']} |")
+        return "\n".join(lines)
+
+    # kind == "phase"
+    stages = node["stages"]
+    done, total = _count_done(stages)
+    lines = [
+        f"**Estado:** {node['status']} ({done}/{total} etapas ✅)",
+        "",
+        "| Etapa | Estado |",
+        "| --- | --- |",
+    ]
+    for s in stages:
+        lines.append(f"| E{s['num']:02d} — {s['title']} | {s['status']} |")
+    return "\n".join(lines)
+
+
+def render_plan(tree: dict) -> str:
+    """Cuerpo generado de PLAN.md: tabla de fases."""
+    phases = tree["phases"]
+    done, total = _count_done(phases)
+    lines = [
+        f"**Estado global:** {done}/{total} fases ✅",
+        "",
+        "| Fase | Estado |",
+        "| --- | --- |",
+    ]
+    for ph in phases:
+        lines.append(f"| F{ph['num']:02d} — {ph['title']} | {ph['status']} |")
+    return "\n".join(lines)
