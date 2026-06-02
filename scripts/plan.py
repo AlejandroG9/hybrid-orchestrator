@@ -245,3 +245,131 @@ def sync(plan_dir: Path) -> dict:
     plan_md.write_text(text, encoding="utf-8")
 
     return tree
+
+
+# ── Scaffolding de niveles ────────────────────────────────────────────────────
+
+def _today() -> str:
+    return datetime.now().strftime("%Y-%m-%d")
+
+
+def _existing_nums(parent: Path, prefix: str) -> list:
+    if not parent.exists():
+        return []
+    return [_num_from_dir(d.name, prefix) for d in parent.glob(f"{prefix}_*") if d.is_dir()]
+
+
+def add_phase(plan_dir: Path, templates_dir: Path, title: str) -> Path:
+    num = next_number(_existing_nums(plan_dir, "fase"))
+    fase_dir = plan_dir / f"fase_{num:02d}"
+    fase_dir.mkdir(parents=True, exist_ok=True)
+    dest = fase_dir / "_fase.md"
+    text = (templates_dir / "fase.md").read_text(encoding="utf-8")
+    text = set_frontmatter_field(text, "id", f"F{num:02d}")
+    text = set_frontmatter_field(text, "title", title)
+    text = set_frontmatter_field(text, "created", _today())
+    dest.write_text(text, encoding="utf-8")
+    sync(plan_dir)
+    return dest
+
+
+def add_stage(plan_dir: Path, templates_dir: Path, phase: int, title: str) -> Path:
+    fase_dir = plan_dir / f"fase_{phase:02d}"
+    if not fase_dir.exists():
+        raise FileNotFoundError(f"La fase {phase:02d} no existe. Crea la fase primero.")
+    num = next_number(_existing_nums(fase_dir, "etapa"))
+    etapa_dir = fase_dir / f"etapa_{num:02d}"
+    etapa_dir.mkdir(parents=True, exist_ok=True)
+    dest = etapa_dir / "_etapa.md"
+    text = (templates_dir / "etapa.md").read_text(encoding="utf-8")
+    text = set_frontmatter_field(text, "id", f"F{phase:02d}_E{num:02d}")
+    text = set_frontmatter_field(text, "title", title)
+    text = set_frontmatter_field(text, "created", _today())
+    dest.write_text(text, encoding="utf-8")
+    sync(plan_dir)
+    return dest
+
+
+def add_activity(plan_dir: Path, templates_dir: Path, phase: int, stage: int,
+                 title: str, run_agent: str = "gemini") -> Path:
+    etapa_dir = plan_dir / f"fase_{phase:02d}" / f"etapa_{stage:02d}"
+    if not etapa_dir.exists():
+        raise FileNotFoundError(f"La etapa F{phase:02d}_E{stage:02d} no existe. Créala primero.")
+    existing = [int(a.stem.split("_")[-1]) for a in etapa_dir.glob("act_*.md")]
+    num = next_number(existing)
+    name = f"act_F{phase:02d}_E{stage:02d}_{num:03d}.md"
+    dest = etapa_dir / name
+    text = (templates_dir / "activity.md").read_text(encoding="utf-8")
+    text = set_frontmatter_field(text, "run-agent", run_agent)
+    text = set_frontmatter_field(text, "status", STATUS["pendiente"])
+    text = set_frontmatter_field(text, "phase", f"F{phase:02d}")
+    text = set_frontmatter_field(text, "stage", f"E{stage:02d}")
+    text = set_frontmatter_field(text, "created", _today())
+    if title:
+        text = text.replace("# Actividad", f"# {title}", 1)
+    dest.write_text(text, encoding="utf-8")
+    sync(plan_dir)
+    return dest
+
+
+def print_status(plan_dir: Path) -> None:
+    tree = scan_plan(plan_dir)
+    if not tree["phases"]:
+        print("No hay plan aún. Crea una fase con: plan.py add-phase --title ...")
+        return
+    print(f"\n📊 Estado del plan ({plan_dir})\n")
+    for ph in tree["phases"]:
+        print(f"F{ph['num']:02d} — {ph['title']}  {ph['status']}")
+        for s in ph["stages"]:
+            print(f"  E{s['num']:02d} — {s['title']}  {s['status']}")
+            for a in s["activities"]:
+                print(f"    act_{a['id']}  [{a['backend']}]  {a['status']}")
+    print()
+
+
+# ── Rutas por defecto ─────────────────────────────────────────────────────────
+
+SKILL_DIR = Path(__file__).resolve().parent.parent
+TEMPLATES_DIR = SKILL_DIR / "templates"
+
+
+def main():
+    parser = argparse.ArgumentParser(description="Hybrid Orchestrator — mecánica del plan vivo")
+    parser.add_argument("--cwd", default=".", help="Raíz del proyecto (default: actual)")
+    sub = parser.add_subparsers(dest="cmd", required=True)
+
+    sp = sub.add_parser("add-phase")
+    sp.add_argument("--title", required=True)
+    ss = sub.add_parser("add-stage")
+    ss.add_argument("--phase", type=int, required=True)
+    ss.add_argument("--title", required=True)
+    sa = sub.add_parser("add-activity")
+    sa.add_argument("--phase", type=int, required=True)
+    sa.add_argument("--stage", type=int, required=True)
+    sa.add_argument("--title", required=True)
+    sa.add_argument("--run-agent", default="gemini")
+    sub.add_parser("sync")
+    sub.add_parser("status")
+
+    args = parser.parse_args()
+    plan_dir = Path(args.cwd).resolve() / "plan"
+
+    try:
+        if args.cmd == "add-phase":
+            print(f"✅ {add_phase(plan_dir, TEMPLATES_DIR, args.title)}")
+        elif args.cmd == "add-stage":
+            print(f"✅ {add_stage(plan_dir, TEMPLATES_DIR, args.phase, args.title)}")
+        elif args.cmd == "add-activity":
+            print(f"✅ {add_activity(plan_dir, TEMPLATES_DIR, args.phase, args.stage, args.title, args.run_agent)}")
+        elif args.cmd == "sync":
+            sync(plan_dir)
+            print("✅ Plan sincronizado")
+        elif args.cmd == "status":
+            print_status(plan_dir)
+    except FileNotFoundError as e:
+        print(f"❌ {e}")
+        sys.exit(1)
+
+
+if __name__ == "__main__":
+    main()

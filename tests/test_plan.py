@@ -165,5 +165,42 @@ class TestSyncIntegration(unittest.TestCase):
             self.assertEqual(first, second)
 
 
+class TestAddCommands(unittest.TestCase):
+    def _templates(self, root: Path) -> Path:
+        tpl = root / "templates"
+        tpl.mkdir()
+        (tpl / "fase.md").write_text(
+            "---\nid: \ntitle: \nstatus: 🔲 pendiente\ncreated: \n---\n\n## Objetivo\n", encoding="utf-8")
+        (tpl / "etapa.md").write_text(
+            "---\nid: \ntitle: \nstatus: 🔲 pendiente\ncreated: \n---\n\n## Objetivo\n", encoding="utf-8")
+        (tpl / "activity.md").write_text(
+            "---\nrun-agent: \nstatus: 🔲 pendiente\nphase: \nstage: \ncreated: \n---\n\n# Actividad\n", encoding="utf-8")
+        return tpl
+
+    def test_add_phase_then_stage_then_activity(self):
+        with tempfile.TemporaryDirectory() as d:
+            root = Path(d)
+            plan = root / "plan"
+            tpl = self._templates(root)
+
+            f = p.add_phase(plan, tpl, "Auth")
+            self.assertEqual(f, plan / "fase_01" / "_fase.md")
+
+            e = p.add_stage(plan, tpl, phase=1, title="Login")
+            self.assertEqual(e, plan / "fase_01" / "etapa_01" / "_etapa.md")
+
+            a = p.add_activity(plan, tpl, phase=1, stage=1, title="Endpoint", run_agent="codex")
+            self.assertEqual(a, plan / "fase_01" / "etapa_01" / "act_F01_E01_001.md")
+            self.assertIn("run-agent: codex", a.read_text(encoding="utf-8"))
+
+    def test_add_stage_missing_phase_errors(self):
+        with tempfile.TemporaryDirectory() as d:
+            root = Path(d)
+            plan = root / "plan"
+            self._templates(root)
+            with self.assertRaises(FileNotFoundError):
+                p.add_stage(plan, root / "templates", phase=9, title="X")
+
+
 if __name__ == "__main__":
     unittest.main()
