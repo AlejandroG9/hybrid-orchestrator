@@ -1,7 +1,8 @@
 # PLAN.md — [Nombre del Proyecto]
 
 > Documento maestro del proyecto. Claude Code lo lee al iniciar cada sesión para orientarse.
-> Actualízalo conforme el proyecto evoluciona.
+> Las zonas autoradas (objetivo, stack, dependencias, decisiones, riesgos) se editan a mano.
+> El bloque de **Estado del proyecto** lo regenera `plan.py sync` — no lo edites.
 
 ---
 
@@ -23,49 +24,15 @@
 
 ---
 
-## 📊 Estado general
+## 📊 Estado del proyecto
 
-| Fase | Nombre | Estado | Actividades |
-|------|--------|--------|-------------|
-| F01 | [nombre] | 🔲 Pendiente | 0/0 |
-| F02 | [nombre] | 🔲 Pendiente | 0/0 |
-| F03 | [nombre] | 🔲 Pendiente | 0/0 |
+> Generado por `plan.py sync` a partir del estado real de las actividades.
+> Para el detalle por nivel, abre el `_fase.md` / `_etapa.md` correspondiente.
 
-**Estados:** 🔲 Pendiente · 🔄 En progreso · ✅ Completada · ⛔ Bloqueada
+<!-- BEGIN:auto — generado por plan.py, no editar -->
+<!-- END:auto -->
 
----
-
-## 📁 Fases y etapas
-
-### Fase 01 — [Nombre de la fase]
-
-*Objetivo de la fase: qué capacidad o componente queda funcional al terminarla.*
-
-#### Etapa 01 — [Nombre de la etapa]
-
-| ID | Actividad | Estado | Asignado a |
-|----|-----------|--------|------------|
-| act_F01_E01_001 | [descripción breve] | 🔲 | Gemini |
-| act_F01_E01_002 | [descripción breve] | 🔲 | Gemini |
-| act_F01_E01_003 | [descripción breve] | 🔲 | Gemini |
-
-#### Etapa 02 — [Nombre de la etapa]
-
-| ID | Actividad | Estado | Asignado a |
-|----|-----------|--------|------------|
-| act_F01_E02_001 | [descripción breve] | 🔲 | Gemini |
-
----
-
-### Fase 02 — [Nombre de la fase]
-
-*Objetivo de la fase.*
-
-#### Etapa 01 — [Nombre de la etapa]
-
-| ID | Actividad | Estado | Asignado a |
-|----|-----------|--------|------------|
-| act_F02_E01_001 | [descripción breve] | 🔲 | Gemini |
+**Estados:** 🔲 pendiente · 🔄 en curso · ✅ hecho · ⛔ bloqueado
 
 ---
 
@@ -73,14 +40,13 @@
 
 *(Lista las dependencias que bloquean el inicio de una fase si otra no está completa.)*
 
-- F02 requiere que F01/E01 esté completa
 - [agregar según el proyecto]
 
 ---
 
 ## 📝 Decisiones de arquitectura
 
-*(Registro de decisiones técnicas importantes tomadas durante el proyecto. Claude Code agrega entradas aquí.)*
+*(Registro de decisiones técnicas importantes. Claude Code agrega entradas aquí.)*
 
 ### [YYYY-MM-DD] — [Título de la decisión]
 **Decisión:** [qué se decidió]
@@ -94,4 +60,3 @@
 | Riesgo | Probabilidad | Impacto | Mitigación |
 |--------|-------------|---------|------------|
 | [descripción] | Alta/Media/Baja | Alto/Medio/Bajo | [estrategia] |
-
