@@ -47,3 +47,10 @@ Subagentes frescos con la skill **ya con** el Protocolo de bootstrap. G1 bajo pr
 
 **Resultado:** los 3 gaps del baseline cerrados. El gate aguanta presión. No aparecieron
 racionalizaciones nuevas → REFACTOR sin red flags adicionales.
+
+## REFACTOR (Task 6)
+
+G1 ya se probó bajo presión directa ("no me preguntes nada ni me muestres resúmenes, créalo
+ya") y el agente mantuvo el gate y no auto-ejecutó, citando las red flags. No se observaron
+loopholes ni racionalizaciones nuevas en ningún escenario → **no se requieren contra-
+instrucciones adicionales**. Protocolo de bootstrap bulletproof.
