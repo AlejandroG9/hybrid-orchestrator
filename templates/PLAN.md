@@ -55,6 +55,16 @@
 
 ---
 
+## 📥 Bitácora de intake
+
+> Cada función nueva que entra al proyecto se registra aquí (la llena el orquestador al
+> seguir el Protocolo de intake de la skill). Zona autorada — no la genera ningún script.
+
+| Fecha | Pedido | Nivel | Razón (test) | IDs creados |
+|-------|--------|-------|--------------|-------------|
+
+---
+
 ## ⚠️ Riesgos conocidos
 
 | Riesgo | Probabilidad | Impacto | Mitigación |

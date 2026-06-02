@@ -56,6 +56,12 @@ correctos; `plan.py sync` regenera el estado (derivado de las actividades) y `PL
 Corre `sync` tras cambiar el `status` de una actividad. **Nunca** edites las zonas
 `<!-- BEGIN:auto -->` … `<!-- END:auto -->`: las regenera el script.
 
+**📥 Intake de funciones nuevas:** cuando el usuario pida una función o cambio nuevo, sigue
+el **Protocolo de intake** de la skill: clasifícalo (fase/etapa/actividad) aplicando los
+tests, **confirma siempre con el gate antes de crear nada**, propón el sub-árbol completo si
+aplica, materialízalo con `plan.py add-*`, y regístralo en la "📥 Bitácora de intake" de
+`plan/PLAN.md`. Si el nivel queda ambiguo, pregunta — no asumas.
+
 ---
 
 ## 🤖 Delegación a subagentes
