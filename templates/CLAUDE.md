@@ -32,23 +32,29 @@ Todos los proyectos que usen este molde siguen esta estructura:
 [nombre-proyecto]/
 ├── CLAUDE.md                        ← este archivo (orquestador)
 ├── plan/
-│   ├── PLAN.md                      ← overview de fases y etapas
+│   ├── PLAN.md                      ← vista de estado (generada por plan.py sync)
 │   ├── fase_01/
+│   │   ├── _fase.md                 ← resumen + estado de la fase
 │   │   ├── etapa_01/
+│   │   │   ├── _etapa.md            ← resumen + estado de la etapa
 │   │   │   ├── act_F01_E01_001.md
-│   │   │   ├── act_F01_E01_002.md
-│   │   │   └── act_F01_E01_003.md
+│   │   │   └── act_F01_E01_002.md
 │   │   └── etapa_02/
-│   │       └── act_F01_E02_001.md
+│   │       └── _etapa.md
 │   └── fase_02/
-│       └── etapa_01/
-│           └── act_F02_E01_001.md
+│       └── _fase.md
 └── src/                             ← código producido por los subagentes
 ```
 
 **Convención de nombres para actividades:**
 `act_F[##]_E[##]_[###].md`
 Ejemplo: `act_F01_E02_003.md` = Fase 1, Etapa 2, Actividad 003
+
+**Gestión del plan:** usa `plan.py` para crear niveles y mantener el estado.
+`plan.py add-phase/add-stage/add-activity` crean fases·etapas·actividades con IDs
+correctos; `plan.py sync` regenera el estado (derivado de las actividades) y `PLAN.md`.
+Corre `sync` tras cambiar el `status` de una actividad. **Nunca** edites las zonas
+`<!-- BEGIN:auto -->` … `<!-- END:auto -->`: las regenera el script.
 
 ---
 

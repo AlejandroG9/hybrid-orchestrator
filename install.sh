@@ -51,7 +51,8 @@ else
     mkdir -p "$SKILL_TARGET/scripts"
     cp "$SKILL_SOURCE/SKILL.md"                "$SKILL_TARGET/SKILL.md"
     cp "$SKILL_SOURCE/scripts/run_subagent.py" "$SKILL_TARGET/scripts/run_subagent.py"
-    chmod +x "$SKILL_TARGET/scripts/run_subagent.py"
+    cp "$SKILL_SOURCE/scripts/plan.py"         "$SKILL_TARGET/scripts/plan.py"
+    chmod +x "$SKILL_TARGET/scripts/run_subagent.py" "$SKILL_TARGET/scripts/plan.py"
 
     # Copiar plantillas dentro de la skill — run_subagent.py carga los briefings
     # de cada backend desde $SKILL_TARGET/templates/agents/[backend].md
