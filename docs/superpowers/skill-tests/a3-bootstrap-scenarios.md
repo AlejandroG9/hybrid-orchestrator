@@ -17,7 +17,22 @@
 
 ## Observaciones baseline (RED) — Task 2
 
-_(pendiente)_
+3 subagentes frescos. La skill ya tiene el Protocolo de **intake** (A2) pero **no** el de
+bootstrap. Los agentes generalizan el intake al objetivo del proyecto.
+
+| # | ¿Descompone con método? | ¿Gate? | ¿Bitácora? | Gap detectado |
+|---|--------------------------|--------|------------|----------------|
+| G1 claro | ✅ top-down (proyecto→fases) | ✅ | ✅ | Improvisa: sin noción explícita de bootstrap (lo trata como "📥 INTAKE") |
+| G2 vago | ✅ reconoce vaguedad | ✅ | ✅ | **Escala a `brainstorming` completo**, no a la "indagación ligera" diseñada |
+| B1 brownfield | ✅ inspecciona código + clasifica | ✅ | ✅ | **No marca ✅ lo ya hecho** (sin instrucción + escenario débil para ✅) |
+
+**Gaps a cerrar con el protocolo de bootstrap:**
+1. **Sin noción top-down explícita** — funciona pero ad hoc. → Definir el protocolo con su propio
+   formato de gate (`🌱 BOOTSTRAP`) y la descomposición recursiva del objetivo.
+2. **Indagación descalibrada** — G2 hizo brainstorming completo. → Especificar "indagación
+   ligera: 1-3 preguntas, no un brainstorm completo".
+3. **Brownfield sin ✅** — ningún agente mapeó lo existente a actividades ✅. → Instrucción
+   explícita + reforzar el escenario B1 (objetivo que abarque trabajo ya hecho).
 
 ## Observaciones con protocolo (GREEN) — Task 5
 
