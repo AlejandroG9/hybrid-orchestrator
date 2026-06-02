@@ -1,7 +1,7 @@
 # Feature A3 — Protocolo de bootstrap (generación inicial del plan)
 
 **Fecha:** 2026-06-02
-**Estado:** Diseño aprobado, pendiente de implementación
+**Estado:** Implementado (2026-06-02)
 **Skill:** hybrid-orchestrator
 **Contexto:** Tercera y última pieza de Feature A ("plan vivo"). Se apoya en A1 (`scripts/plan.py`)
 y A2 (protocolo de intake: tests de clasificación, gate, bitácora), ambos ya implementados.
