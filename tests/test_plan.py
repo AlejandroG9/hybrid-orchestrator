@@ -1,4 +1,6 @@
 import sys
+import tempfile
+import textwrap
 import unittest
 from pathlib import Path
 
@@ -120,6 +122,47 @@ class TestRender(unittest.TestCase):
         out = p.render_plan(tree)
         self.assertIn("F01", out)
         self.assertIn("Auth", out)
+
+
+class TestSyncIntegration(unittest.TestCase):
+    def _write(self, path: Path, content: str):
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text(textwrap.dedent(content), encoding="utf-8")
+
+    def _build_plan(self, root: Path):
+        plan = root / "plan"
+        self._write(plan / "fase_01" / "_fase.md",
+                    "---\nid: F01\ntitle: Auth\nstatus: 🔲 pendiente\n---\n\nObjetivo de la fase\n")
+        self._write(plan / "fase_01" / "etapa_01" / "_etapa.md",
+                    "---\nid: F01_E01\ntitle: Login\nstatus: 🔲 pendiente\n---\n\nObjetivo de la etapa\n")
+        self._write(plan / "fase_01" / "etapa_01" / "act_F01_E01_001.md",
+                    "---\nrun-agent: gemini\nstatus: ✅ hecho\nphase: F01\nstage: E01\n---\n\n# Actividad\n")
+        self._write(plan / "fase_01" / "etapa_01" / "act_F01_E01_002.md",
+                    "---\nrun-agent: codex\nstatus: 🔲 pendiente\nphase: F01\nstage: E01\n---\n\n# Actividad\n")
+        return plan
+
+    def test_sync_derives_status_and_regenerates(self):
+        with tempfile.TemporaryDirectory() as d:
+            plan = self._build_plan(Path(d))
+            p.sync(plan)
+            etapa = (plan / "fase_01" / "etapa_01" / "_etapa.md").read_text(encoding="utf-8")
+            fase = (plan / "fase_01" / "_fase.md").read_text(encoding="utf-8")
+            planmd = (plan / "PLAN.md").read_text(encoding="utf-8")
+            self.assertIn("🔄 en curso", etapa)
+            self.assertIn("status: 🔄 en curso", etapa)
+            self.assertIn("🔄 en curso", fase)
+            self.assertIn("Objetivo de la etapa", etapa)
+            self.assertIn("F01", planmd)
+            self.assertIn("Auth", planmd)
+
+    def test_sync_is_idempotent(self):
+        with tempfile.TemporaryDirectory() as d:
+            plan = self._build_plan(Path(d))
+            p.sync(plan)
+            first = (plan / "fase_01" / "_fase.md").read_text(encoding="utf-8")
+            p.sync(plan)
+            second = (plan / "fase_01" / "_fase.md").read_text(encoding="utf-8")
+            self.assertEqual(first, second)
 
 
 if __name__ == "__main__":

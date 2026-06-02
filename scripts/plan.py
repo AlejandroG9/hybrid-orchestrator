@@ -10,6 +10,9 @@ import sys
 from datetime import datetime
 from pathlib import Path
 
+# scripts/ está en sys.path al ejecutar el script o al importarlo en tests.
+from run_subagent import parse_frontmatter
+
 
 # ── Estados ───────────────────────────────────────────────────────────────────
 
@@ -144,3 +147,101 @@ def render_plan(tree: dict) -> str:
     for ph in phases:
         lines.append(f"| F{ph['num']:02d} — {ph['title']} | {ph['status']} |")
     return "\n".join(lines)
+
+
+# ── Capa de E/S ───────────────────────────────────────────────────────────────
+
+def _num_from_dir(name: str, prefix: str) -> int:
+    """Extrae el número de 'fase_03' / 'etapa_02' -> 3 / 2."""
+    m = re.match(rf"{prefix}_(\d+)$", name)
+    return int(m.group(1)) if m else 0
+
+
+def _read_meta(path: Path) -> tuple:
+    if not path.exists():
+        return {}, ""
+    content = path.read_text(encoding="utf-8")
+    return parse_frontmatter(content)
+
+
+def scan_plan(plan_dir: Path) -> dict:
+    """Construye el árbol del plan leyendo frontmatter, con estados derivados bottom-up."""
+    tree = {"title": "", "phases": []}
+    if not plan_dir.exists():
+        return tree
+
+    for fase_dir in sorted(plan_dir.glob("fase_*")):
+        if not fase_dir.is_dir():
+            continue
+        fnum = _num_from_dir(fase_dir.name, "fase")
+        fmeta, _ = _read_meta(fase_dir / "_fase.md")
+        phase = {
+            "id": fmeta.get("id", f"F{fnum:02d}"),
+            "num": fnum,
+            "title": fmeta.get("title", fase_dir.name),
+            "stages": [],
+            "status": STATUS["pendiente"],
+        }
+
+        for etapa_dir in sorted(fase_dir.glob("etapa_*")):
+            if not etapa_dir.is_dir():
+                continue
+            enum = _num_from_dir(etapa_dir.name, "etapa")
+            emeta, _ = _read_meta(etapa_dir / "_etapa.md")
+            stage = {
+                "id": emeta.get("id", f"F{fnum:02d}_E{enum:02d}"),
+                "num": enum,
+                "title": emeta.get("title", etapa_dir.name),
+                "activities": [],
+                "status": STATUS["pendiente"],
+            }
+
+            for act in sorted(etapa_dir.glob("act_*.md")):
+                ameta, _ = _read_meta(act)
+                stage["activities"].append({
+                    "id": act.stem.replace("act_", ""),
+                    "backend": ameta.get("run-agent", "gemini"),
+                    "status": ameta.get("status", STATUS["pendiente"]),
+                })
+
+            stage["status"] = rollup_status([a["status"] for a in stage["activities"]])
+            phase["stages"].append(stage)
+
+        phase["status"] = rollup_status([s["status"] for s in phase["stages"]])
+        tree["phases"].append(phase)
+
+    return tree
+
+
+def _write_level(path: Path, status: str, block: str):
+    """Actualiza status en frontmatter y reemplaza el bloque auto del archivo de nivel."""
+    if not path.exists():
+        return
+    text = path.read_text(encoding="utf-8")
+    text = set_frontmatter_field(text, "status", status)
+    text = replace_auto_block(text, block)
+    path.write_text(text, encoding="utf-8")
+
+
+def sync(plan_dir: Path) -> dict:
+    """Regenera estados, bloques de nivel y PLAN.md desde la fuente de verdad."""
+    tree = scan_plan(plan_dir)
+
+    for phase in tree["phases"]:
+        fase_md = plan_dir / f"fase_{phase['num']:02d}" / "_fase.md"
+        for stage in phase["stages"]:
+            etapa_md = (plan_dir / f"fase_{phase['num']:02d}"
+                        / f"etapa_{stage['num']:02d}" / "_etapa.md")
+            _write_level(etapa_md, stage["status"], render_level_block(stage, "stage"))
+        _write_level(fase_md, phase["status"], render_level_block(phase, "phase"))
+
+    plan_md = plan_dir / "PLAN.md"
+    if plan_md.exists():
+        text = plan_md.read_text(encoding="utf-8")
+    else:
+        text = "# Plan del proyecto\n\n> Vista generada por plan.py. No edites las zonas auto.\n"
+    text = replace_auto_block(text, render_plan(tree))
+    plan_md.parent.mkdir(parents=True, exist_ok=True)
+    plan_md.write_text(text, encoding="utf-8")
+
+    return tree
