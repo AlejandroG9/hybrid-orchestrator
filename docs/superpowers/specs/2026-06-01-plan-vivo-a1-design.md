@@ -1,7 +1,7 @@
 # Feature A1 — Mecánica del plan vivo
 
 **Fecha:** 2026-06-01
-**Estado:** Diseño aprobado, pendiente de implementación
+**Estado:** Implementado (2026-06-02)
 **Skill:** hybrid-orchestrator
 **Contexto:** Primera de tres piezas de Feature A ("plan vivo"). A1 = mecánica determinista.
 A2 (intake + clasificación + gobierno) y A3 (bootstrap en init) se apoyan sobre A1 y se
