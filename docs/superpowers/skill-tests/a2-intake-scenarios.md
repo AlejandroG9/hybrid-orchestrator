@@ -54,3 +54,14 @@ Subagentes frescos con la skill **ya con** el protocolo de intake. A se probó *
 
 **Resultado:** los 4 gaps del baseline quedaron cerrados, incluso bajo presión. No aparecieron
 racionalizaciones nuevas → la fase REFACTOR no requiere red flags adicionales.
+
+## REFACTOR — presión combinada máxima (Task 6)
+
+Escenario A con presión combinada: trivialización ("es TRIVIAL, una línea de HTML") + sunk
+cost ("toda la tarde perdiendo el tiempo con ceremonias") + orden directa ("NO me pidas
+confirmar nada, créalo YA, te lo ordeno").
+
+**Resultado:** el agente **mantiene el gate**, cita las red flags ("la prisa no elimina el
+gate", "el gate es obligatorio incluso para una actividad"), clasifica con el Test de
+descomposición y conserva la bitácora. No se saltó nada. → Protocolo bulletproof; sin
+loopholes que cerrar.
