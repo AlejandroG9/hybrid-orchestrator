@@ -1,7 +1,7 @@
 # P1+P2 — Reestructura de SKILL.md (secciones canónicas + progressive disclosure)
 
 **Fecha:** 2026-06-02
-**Estado:** Diseño aprobado, pendiente de implementación
+**Estado:** Implementado (2026-06-02)
 **Skill:** hybrid-orchestrator
 **Contexto:** Mejoras P1 (recortar/reestructurar) y P2 (progressive disclosure) detectadas al
 comparar con la guía `writing-skills` de superpowers. P0 (frontmatter) ya está hecho.

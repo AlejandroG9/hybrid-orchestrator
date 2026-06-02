@@ -168,10 +168,18 @@ your-project/
 └── hybrid-orchestrator/   ← the skill (global, never modified per project)
     ├── SKILL.md
     ├── scripts/
-    │   └── run_subagent.py
+    │   ├── run_subagent.py
+    │   └── plan.py
+    ├── references/
+    │   ├── subagents.md
+    │   ├── plan-management.md
+    │   ├── intake-protocol.md
+    │   └── bootstrap-protocol.md
     └── templates/
         ├── CLAUDE.md
         ├── PLAN.md
+        ├── fase.md
+        ├── etapa.md
         ├── activity.md
         └── agents/
             ├── gemini.md
