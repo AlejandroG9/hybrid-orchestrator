@@ -1,7 +1,7 @@
 # Feature A2 — Protocolo de intake (clasificación + gobierno)
 
 **Fecha:** 2026-06-02
-**Estado:** Diseño aprobado, pendiente de implementación
+**Estado:** Implementado (2026-06-02)
 **Skill:** hybrid-orchestrator
 **Contexto:** Segunda pieza de Feature A ("plan vivo"). Se apoya en A1 (`scripts/plan.py`,
 ya implementado). A3 (bootstrap en init) queda para después.
