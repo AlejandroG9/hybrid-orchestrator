@@ -24,9 +24,22 @@ Proyecto: TaskApp
 - Registra el intake en la bitácora.
 - En el ambiguo (D): pregunta, no asume.
 
-## Observaciones baseline (RED) — se llenan en Task 2
+## Observaciones baseline (RED) — Task 2
 
-_(pendiente)_
+4 subagentes frescos, skill **sin** protocolo de intake (solo el flujo genérico de A1).
+
+| # | ¿Clasificó? | ¿Método? | ¿Gate antes de crear? | ¿Cascada? | ¿Bitácora? |
+|---|-------------|----------|------------------------|-----------|------------|
+| A (actividad) | ✅ actividad | ❌ intuición | ❌ **crearía el archivo y solo confirmaría antes de delegar** | n/a | ❌ |
+| B (etapa) | ✅ etapa | ❌ intuición | ⚠️ propuso árbol + "¿procedo?" | ✅ | ❌ |
+| C (fase) | ✅ fase | ❌ intuición | ⚠️ propuso árbol + "¿procedo?" | ✅ | ❌ |
+| D (ambiguo) | ⚠️ asumió fase | ❌ intuición | ⚠️ propuso árbol | ✅ | ❌ |
+
+**Racionalizaciones / fallos a cerrar con el protocolo:**
+1. **Sin metodología explícita** — clasifican "por tamaño/intuición"; resultados no reproducibles entre agentes. → Definir los tests 1-5 y exigir nombrar cuál decidió.
+2. **Gate mal ubicado** — el agente A materializa (`add-activity`) y confirma *después*, solo antes de ejecutar. → El gate va **antes de crear cualquier archivo**.
+3. **Sin bitácora de intake** — ningún agente registró la decisión. → Hacerla obligatoria.
+4. **Ambigüedad = asumir** — D asumió "fase" en vez de **preguntar el nivel primero**. → Regla explícita: empate residual → preguntar, no asumir.
 
 ## Observaciones con protocolo (GREEN) — se llenan en Task 5
 
