@@ -1,3 +1,8 @@
+---
+name: hybrid-orchestrator
+description: Use when actuando como arquitecto/PM de un proyecto de software y delegando la implementación a agentes CLI externos (Gemini, Codex, Cursor, Claude); cuando se organiza el trabajo en fases, etapas y actividades con trazabilidad; o cuando el CLAUDE.md del proyecto lista hybrid-orchestrator.
+---
+
 # Hybrid Orchestrator Skill
 
 ## ¿Qué hace esta skill?
