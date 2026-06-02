@@ -31,5 +31,16 @@ class TestRollupStatus(unittest.TestCase):
         self.assertEqual(p.rollup_status(["🔲 pendiente", "🔲 pendiente"]), p.STATUS["pendiente"])
 
 
+class TestNextNumber(unittest.TestCase):
+    def test_empty_starts_at_one(self):
+        self.assertEqual(p.next_number([]), 1)
+
+    def test_consecutive(self):
+        self.assertEqual(p.next_number([1, 2, 3]), 4)
+
+    def test_with_gaps_appends_after_max(self):
+        self.assertEqual(p.next_number([1, 3]), 4)
+
+
 if __name__ == "__main__":
     unittest.main()

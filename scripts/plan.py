@@ -48,3 +48,8 @@ def rollup_status(children: list) -> str:
     if any(c == "hecho" for c in cats) and any(c == "pendiente" for c in cats):
         return STATUS["en curso"]
     return STATUS["pendiente"]
+
+
+def next_number(existing: list) -> int:
+    """Siguiente número en un nivel (append tras el máximo; huecos no se rellenan)."""
+    return (max(existing) + 1) if existing else 1
