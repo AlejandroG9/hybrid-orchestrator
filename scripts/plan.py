@@ -53,3 +53,26 @@ def rollup_status(children: list) -> str:
 def next_number(existing: list) -> int:
     """Siguiente número en un nivel (append tras el máximo; huecos no se rellenan)."""
     return (max(existing) + 1) if existing else 1
+
+
+def set_frontmatter_field(text: str, key: str, value: str) -> str:
+    """Actualiza (o inserta) un campo en el frontmatter YAML del texto."""
+    if not text.startswith("---"):
+        return f"---\n{key}: {value}\n---\n\n{text}"
+
+    parts = text.split("---", 2)
+    # parts[0] == "" ; parts[1] == frontmatter ; parts[2] == cuerpo
+    fm_lines = parts[1].strip("\n").split("\n")
+    key_re = re.compile(rf"^{re.escape(key)}\s*:")
+
+    replaced = False
+    for i, line in enumerate(fm_lines):
+        if key_re.match(line):
+            fm_lines[i] = f"{key}: {value}"
+            replaced = True
+            break
+    if not replaced:
+        fm_lines.append(f"{key}: {value}")
+
+    new_fm = "\n".join(fm_lines)
+    return f"---\n{new_fm}\n---{parts[2]}"

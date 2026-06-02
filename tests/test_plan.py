@@ -42,5 +42,20 @@ class TestNextNumber(unittest.TestCase):
         self.assertEqual(p.next_number([1, 3]), 4)
 
 
+class TestSetFrontmatterField(unittest.TestCase):
+    def test_replaces_existing_key(self):
+        text = "---\nid: F01\nstatus: 🔲 pendiente\n---\n\nObjetivo\n"
+        out = p.set_frontmatter_field(text, "status", "✅ hecho")
+        self.assertIn("status: ✅ hecho", out)
+        self.assertNotIn("🔲 pendiente", out)
+        self.assertIn("Objetivo", out)
+
+    def test_inserts_missing_key(self):
+        text = "---\nid: F01\n---\n\nObjetivo\n"
+        out = p.set_frontmatter_field(text, "status", "🔄 en curso")
+        self.assertIn("status: 🔄 en curso", out)
+        self.assertIn("id: F01", out)
+
+
 if __name__ == "__main__":
     unittest.main()
