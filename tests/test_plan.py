@@ -57,5 +57,31 @@ class TestSetFrontmatterField(unittest.TestCase):
         self.assertIn("id: F01", out)
 
 
+class TestReplaceAutoBlock(unittest.TestCase):
+    def test_replaces_between_markers(self):
+        text = (
+            "# Fase\n\nObjetivo autorado\n\n"
+            f"{p.BEGIN_AUTO}\nviejo\n{p.END_AUTO}\n"
+        )
+        out = p.replace_auto_block(text, "**Estado:** ✅ hecho")
+        self.assertIn("**Estado:** ✅ hecho", out)
+        self.assertNotIn("viejo", out)
+        self.assertIn("Objetivo autorado", out)
+
+    def test_appends_when_no_markers(self):
+        text = "# Fase\n\nObjetivo autorado\n"
+        out = p.replace_auto_block(text, "**Estado:** 🔲 pendiente")
+        self.assertIn(p.BEGIN_AUTO, out)
+        self.assertIn(p.END_AUTO, out)
+        self.assertIn("**Estado:** 🔲 pendiente", out)
+        self.assertIn("Objetivo autorado", out)
+
+    def test_idempotent(self):
+        text = "# Fase\n\nObjetivo\n"
+        once = p.replace_auto_block(text, "X")
+        twice = p.replace_auto_block(once, "X")
+        self.assertEqual(once, twice)
+
+
 if __name__ == "__main__":
     unittest.main()

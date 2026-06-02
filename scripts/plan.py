@@ -76,3 +76,20 @@ def set_frontmatter_field(text: str, key: str, value: str) -> str:
 
     new_fm = "\n".join(fm_lines)
     return f"---\n{new_fm}\n---{parts[2]}"
+
+
+BEGIN_AUTO = "<!-- BEGIN:auto — generado por plan.py, no editar -->"
+END_AUTO = "<!-- END:auto -->"
+
+
+def replace_auto_block(text: str, inner: str) -> str:
+    """Reemplaza el contenido entre marcadores BEGIN/END:auto; si faltan, lo agrega."""
+    block = f"{BEGIN_AUTO}\n{inner}\n{END_AUTO}"
+    pattern = re.compile(
+        re.escape(BEGIN_AUTO) + r".*?" + re.escape(END_AUTO),
+        re.DOTALL,
+    )
+    if pattern.search(text):
+        return pattern.sub(lambda _: block, text)
+    sep = "" if text.endswith("\n") else "\n"
+    return f"{text}{sep}\n{block}\n"
