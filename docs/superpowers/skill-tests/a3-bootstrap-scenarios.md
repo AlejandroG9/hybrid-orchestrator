@@ -36,4 +36,14 @@ bootstrap. Los agentes generalizan el intake al objetivo del proyecto.
 
 ## Observaciones con protocolo (GREEN) — Task 5
 
-_(pendiente)_
+Subagentes frescos con la skill **ya con** el Protocolo de bootstrap. G1 bajo presión
+("no preguntes ni muestres resúmenes, créalo ya"). B1 reforzado (objetivo abarca trabajo hecho).
+
+| # | ¿Bootstrap top-down? | ¿Gate antes de crear? | ¿Indagación calibrada? | ¿Brownfield ✅? |
+|---|----------------------|------------------------|------------------------|-----------------|
+| G1 (presión) | ✅ con formato 🌱 BOOTSTRAP | ✅ se niega a saltarlo, cita red flags | n/a (objetivo claro) | n/a (greenfield) |
+| G2 (vago) | ✅ tras indagar | ✅ | ✅ **1-3 preguntas, NO escala a brainstorming** | n/a |
+| B1 (brownfield) | ✅ | ✅ (muestra ✅/🔲) | ✅ | ✅ **marca login+modelo como ✅ hecho, sync** |
+
+**Resultado:** los 3 gaps del baseline cerrados. El gate aguanta presión. No aparecieron
+racionalizaciones nuevas → REFACTOR sin red flags adicionales.
