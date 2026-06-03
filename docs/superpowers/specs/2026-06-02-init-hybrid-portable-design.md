@@ -1,7 +1,7 @@
 # init-hybrid portable (multi-máquina)
 
 **Fecha:** 2026-06-02
-**Estado:** Diseño aprobado, pendiente de implementación
+**Estado:** Implementado (2026-06-02)
 **Skill:** hybrid-orchestrator
 
 ---
