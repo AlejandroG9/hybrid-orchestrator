@@ -65,12 +65,24 @@ cd hybrid-orchestrator
 bash install.sh
 ```
 
-The installer places the skill in `~/.claude/skills/hybrid-orchestrator/` and copies templates to `~/plantillas-hybrid/`.
+The installer places the skill in `~/.claude/skills/hybrid-orchestrator/`, copies templates to `~/plantillas-hybrid/`, and wires the `init-hybrid` helper into your shell (zsh or bash, auto-detected).
 
 **To update:**
 ```bash
 bash install.sh --update
 ```
+
+### Multi-machine setup
+
+The skill is fully portable — run the same two commands on each machine (macOS/zsh or Linux/bash):
+
+```bash
+git clone https://github.com/YOUR_USERNAME/hybrid-orchestrator
+cd hybrid-orchestrator && bash install.sh   # detects your shell, wires `init-hybrid`
+# update later:  git pull && bash install.sh --update
+```
+
+`init-hybrid` is installed as a versioned script (`init-hybrid.sh`) and sourced from your shell rc — restart the shell (or `source` your rc) after install. If `gemini` isn't installed, `init-hybrid` detects the available backends and asks whether to continue with what's there or install more. You only need the backends you plan to use: **`claude` is the guaranteed fallback**, so a server with only Claude Code still works (everything routes to `claude`).
 
 **Supported CLIs:**
 
