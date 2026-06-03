@@ -88,11 +88,31 @@ for archivo in CLAUDE.md PLAN.md activity.md; do
     fi
 done
 
-# ── 4. Actualizar init-hybrid para que use ~/plantillas-hybrid/ ───
+# ── 4. Instalar init-hybrid y cablearlo al shell ──────────────────
 echo ""
-echo "📌 Recuerda: init-hybrid usa las plantillas de $TEMPLATES_TARGET"
-echo "   Si ya tienes init-hybrid instalado en ~/.zshrc o ~/.bashrc"
-echo "   asegúrate de que HYBRID_TEMPLATES apunte a: $TEMPLATES_TARGET"
+mkdir -p "$SKILL_TARGET"
+cp "$SKILL_SOURCE/init-hybrid.sh" "$SKILL_TARGET/init-hybrid.sh"
+echo "✅ init-hybrid.sh instalado en $SKILL_TARGET"
+
+shell_name="$(basename "${SHELL:-zsh}")"
+case "$shell_name" in
+    zsh)  RC="$HOME/.zshrc" ;;
+    bash) RC="$HOME/.bashrc" ;;
+    *)    RC="$HOME/.zshrc"; echo "⚠️  Shell '$shell_name' no reconocido; usando $RC" ;;
+esac
+
+MARKER="# >>> hybrid-orchestrator >>>"
+if ! grep -qF "$MARKER" "$RC" 2>/dev/null; then
+    {
+        echo ""
+        echo "$MARKER"
+        echo '[ -f "$HOME/.claude/skills/hybrid-orchestrator/init-hybrid.sh" ] && . "$HOME/.claude/skills/hybrid-orchestrator/init-hybrid.sh"'
+        echo "# <<< hybrid-orchestrator <<<"
+    } >> "$RC"
+    echo "✅ init-hybrid cableado en $RC — reinicia el shell o ejecuta: source $RC"
+else
+    echo "✅ init-hybrid ya estaba cableado en $RC"
+fi
 
 # ── 5. Resumen final ──────────────────────────────────────────────
 echo ""
