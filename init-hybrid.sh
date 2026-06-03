@@ -42,10 +42,11 @@ init-hybrid() {
         python3 "$HOME/.claude/skills/hybrid-orchestrator/scripts/plan.py" --cwd . sync 2>/dev/null
     fi
 
-    # 4. Escanear el proyecto con Gemini
+    # 4. Detectar backends y escanear (solo si hay gemini)
     echo ""
-    echo "🤖 Analizando proyecto con Gemini..."
-    SCAN_RESULT=$(gemini -p "Analiza el directorio actual y genera un resumen técnico conciso en español con este formato exacto:
+    if command -v gemini >/dev/null 2>&1; then
+        echo "🤖 Analizando proyecto con Gemini..."
+        SCAN_RESULT=$(gemini -p "Analiza el directorio actual y genera un resumen técnico conciso en español con este formato exacto:
 
 TIPO: [nuevo | existente]
 STACK: [tecnologías detectadas separadas por coma, o 'No detectado' si está vacío]
@@ -56,13 +57,40 @@ RESUMEN: [2 oraciones describiendo qué es este proyecto y en qué estado está.
 RECOMENDACION: [qué debería hacer Claude Code primero al iniciar sesión aquí]
 
 Solo responde con ese bloque. Sin explicaciones adicionales." --all-files 2>/dev/null)
-
-    echo ""
-    echo "📊 Resultado del escaneo:"
-    echo "──────────────────────────────────────────────"
-    echo "$SCAN_RESULT"
-    echo "──────────────────────────────────────────────"
-    echo ""
+        echo ""
+        echo "📊 Resultado del escaneo:"
+        echo "──────────────────────────────────────────────"
+        echo "$SCAN_RESULT"
+        echo "──────────────────────────────────────────────"
+        echo ""
+    else
+        available=""
+        for b in claude codex cursor-agent; do
+            command -v "$b" >/dev/null 2>&1 && available="$available $b"
+        done
+        if [ -z "${available# }" ]; then
+            echo "❌ No hay ningún backend instalado (ni claude). Instala al menos Claude Code:"
+            echo "   curl -fsSL https://claude.ai/install.sh | bash"
+            return 1
+        fi
+        echo "⚠️  gemini no está instalado. Backends disponibles:$available"
+        printf "¿Continuar solo con lo disponible? [s] continuar / [n] ver cómo instalar más: "
+        read -r answer
+        case "$answer" in
+            n|N)
+                echo "Instala los backends que quieras y re-corre init-hybrid:"
+                echo "   gemini:       npm install -g @google/gemini-cli"
+                echo "   codex:        npm install -g @openai/codex"
+                echo "   cursor-agent: curl https://cursor.com/install -fsS | bash"
+                return 0
+                ;;
+        esac
+        SCAN_RESULT="TIPO: [no escaneado]
+RESUMEN: Escaneo automático omitido (no hay gemini). El protocolo de bootstrap leerá el repo en la sesión.
+RECOMENDACION: Pide a Claude 'haz el bootstrap del plan'."
+        echo "ℹ️  Escaneo omitido; el bootstrap armará el contexto en la sesión."
+        echo ""
+    fi
 
     # 5. Generar o actualizar CLAUDE.md
     if [ "$CLAUDE_EXISTS" = false ]; then
